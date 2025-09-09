@@ -31,6 +31,39 @@ Future<void> showLoginDialog(BuildContext context) async {
             onPressed: () => Navigator.pop(context),
             child: const Text("Cancel"),
           ),
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     try {
+          //       final response = await supabase.auth.signInWithPassword(
+          //         email: emailController.text.trim(),
+          //         password: passwordController.text.trim(),
+          //       );
+
+          //       if (response.user != null) {
+          //         Navigator.pop(context); // zamyka dialog
+          //         Navigator.pushReplacementNamed(
+          //           context,
+          //           '/home',
+          //         ); // przejście do HomePage
+          //       } else {
+          //         ScaffoldMessenger.of(context).showSnackBar(
+          //           const SnackBar(
+          //             content: Text('Login failed. Please try again.'),
+          //           ),
+          //         );
+          //       }
+          //     } on AuthApiException catch (e) {
+          //       ScaffoldMessenger.of(
+          //         context,
+          //       ).showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
+          //     } catch (e) {
+          //       ScaffoldMessenger.of(
+          //         context,
+          //       ).showSnackBar(SnackBar(content: Text('Unexpected error: $e')));
+          //     }
+          //   },
+          //   child: const Text("Login"),
+          // ),
           ElevatedButton(
             onPressed: () async {
               try {
@@ -38,10 +71,52 @@ Future<void> showLoginDialog(BuildContext context) async {
                   email: emailController.text.trim(),
                   password: passwordController.text.trim(),
                 );
-                print("✅ Logged in: ${response.user?.id}");
-                Navigator.pop(context);
+
+                if (!context.mounted) return;
+
+                if (response.user != null) {
+                  Navigator.pop(context); // zamyka dialog
+                  Navigator.pushReplacementNamed(
+                    context,
+                    '/home',
+                  ); // przejście do HomePage
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Login failed. Please try again.'),
+                    ),
+                  );
+                }
+              } on AuthApiException catch (e) {
+                showDialog(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: const Text("Login failed"),
+                        content: Text(e.message),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      ),
+                );
               } catch (e) {
-                print("❌ Login error: $e");
+                showDialog(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: const Text("Unexpected error"),
+                        content: Text(e.toString()),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      ),
+                );
               }
             },
             child: const Text("Login"),
