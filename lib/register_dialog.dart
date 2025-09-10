@@ -37,7 +37,10 @@ Future<void> showRegisterDialog(BuildContext context) async {
                 final response = await supabase.auth.signUp(
                   email: emailController.text.trim(),
                   password: passwordController.text.trim(),
+                  emailRedirectTo: 'erpdemo://auth-callback?flow=signup',
                 );
+
+                if (!context.mounted) return;
 
                 final user = response.user;
 

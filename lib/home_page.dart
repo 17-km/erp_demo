@@ -41,6 +41,7 @@ class HomePage extends StatelessWidget {
               onPressed: () async {
                 // używamy lokalnie zdefiniowanego klienta
                 await supabase.auth.signOut();
+                if (!context.mounted) return;
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const AuthPage()),
