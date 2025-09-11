@@ -46,11 +46,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // zamyka dialog
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/auth',
-                      (r) => false,
-                    );
+                    // Navigator.pushNamedAndRemoveUntil(
+                    //   context,
+                    //   '/auth',
+                    //   (r) => false,
+                    // );
                   },
                   child: const Text('OK'),
                 ),

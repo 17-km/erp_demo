@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import '../features/auth/auth_page.dart';
-import '../features/home/home_page.dart';
+// import '../features/auth/auth_page.dart';
+// import '../features/home/home_page.dart';
 import '../features/tables/table_page.dart';
 import '../features/auth/reset_password_page.dart';
 
 class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case '/auth':
-        return MaterialPageRoute(builder: (_) => const AuthPage());
-      case '/home':
-        return MaterialPageRoute(builder: (_) => const HomePage());
       case '/reset-password':
         return MaterialPageRoute(builder: (_) => const ResetPasswordPage());
       case '/table':

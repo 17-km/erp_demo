@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../tables/table_page.dart';
-import '../auth/auth_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends StatelessWidget {
+import '../tables/table_page.dart';
+import '../auth/auth_provider.dart'; // używamy tylko providera (AuthPage już niepotrzebny tu)
+
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // tutaj definiujemy klienta Supabase
-    final supabase = Supabase.instance.client;
-
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: const Text('ERP Demo')),
       body: Center(
@@ -18,36 +16,34 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TablePage(tableName: 'users'),
-                    ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TablePage(tableName: 'users'),
                   ),
+                );
+              },
               child: const Text('Users'),
             ),
             ElevatedButton(
-              onPressed:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TablePage(tableName: 'projects'),
-                    ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => const TablePage(tableName: 'projects'),
                   ),
+                );
+              },
               child: const Text('Projects'),
             ),
             ElevatedButton(
               onPressed: () async {
-                // używamy lokalnie zdefiniowanego klienta
-                await supabase.auth.signOut();
-                if (!context.mounted) return;
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AuthPage()),
-                );
+                await ref.read(authProvider.notifier).signOut();
+                // RootRouter sam przełączy na AuthPage po utracie sesji
               },
-              child: const Text("🔒 Logout"),
+              child: const Text('🔒 Logout'),
             ),
           ],
         ),

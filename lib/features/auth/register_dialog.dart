@@ -66,7 +66,7 @@ Future<void> showRegisterDialog(BuildContext context) async {
                     );
                   } else {
                     // ✅ sukces
-                    // Navigator.pop(context); // zamykamy okno rejestracji
+                    Navigator.pop(context); // zamykamy okno rejestracji
                     showDialog(
                       context: context,
                       builder:

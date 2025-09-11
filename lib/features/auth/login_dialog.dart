@@ -32,7 +32,7 @@ Future<void> showLoginDialog(BuildContext context) async {
               if (!ctx.mounted) return;
               if (res.user != null) {
                 Navigator.pop(ctx); // zamknij dialog
-                Navigator.pushReplacementNamed(ctx, '/home');
+                // Navigator.pushReplacementNamed(ctx, '/home');
               } else {
                 _alert(ctx, 'Login failed', 'Login failed. Please try again.');
               }
