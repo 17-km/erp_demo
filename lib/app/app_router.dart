@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../auth_page.dart';
-import '../home_page.dart';
-import '../table_page.dart';
-import '../reset_password_page.dart';
+import '../features/auth/auth_page.dart';
+import '../features/home/home_page.dart';
+import '../features/tables/table_page.dart';
+import '../features/auth/reset_password_page.dart';
 
 class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {

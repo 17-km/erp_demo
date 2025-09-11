@@ -3,9 +3,9 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../auth_page.dart';
-import '../home_page.dart';
-import '../reset_password_page.dart';
+import '../features/auth/auth_page.dart';
+import '../features/home/home_page.dart';
+import '../features/auth/reset_password_page.dart';
 import 'app.dart';
 
 final supabase = Supabase.instance.client;
