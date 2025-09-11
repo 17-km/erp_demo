@@ -46,6 +46,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // zamyka dialog
+                    Navigator.of(context).pop(); // zamknij ResetPasswordPage
                     // Navigator.pushNamedAndRemoveUntil(
                     //   context,
                     //   '/auth',
