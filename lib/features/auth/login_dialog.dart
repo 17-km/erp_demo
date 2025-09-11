@@ -71,7 +71,7 @@ Future<void> showLoginDialog(BuildContext context) async {
               _alert(
                 ctx,
                 'Check your email',
-                'We sent you a link to reset your password.\nLinks are one-time and expire quickly.',
+                'If an account with this email exists, we have sent you a link to reset your password.\nLinks are one-time and expire quickly.',
               );
             } on AuthException catch (e) {
               if (!ctx.mounted) return;
