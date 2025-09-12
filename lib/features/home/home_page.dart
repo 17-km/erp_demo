@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../tables/table_page.dart';
+import 'package:erp_demo/features/admin/admin_panel.dart';
 import '../auth/auth_provider.dart'; // używamy tylko providera (AuthPage już niepotrzebny tu)
 
 class HomePage extends ConsumerWidget {
@@ -34,6 +35,15 @@ class HomePage extends ConsumerWidget {
                     builder:
                         (context) => const TablePage(tableName: 'projects'),
                   ),
+                );
+              },
+              child: const Text('Projects'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminPanel()),
                 );
               },
               child: const Text('Projects'),

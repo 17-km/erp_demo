@@ -1,109 +1,123 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:erp_demo/features/tables/table_provider.dart';
+import 'widgets/add_row_dialog.dart';
 
-class TablePage extends StatefulWidget {
+class TablePage extends ConsumerWidget {
   final String tableName;
+
   const TablePage({super.key, required this.tableName});
 
   @override
-  _TablePageState createState() => _TablePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncRows = ref.watch(tableProvider(tableName));
 
-class _TablePageState extends State<TablePage> {
-  final supabase = Supabase.instance.client;
-  List<DataColumn> columns = [];
-  List<DataRow> rows = [];
-  bool isLoading = true;
-  String? error;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-  }
-
-  Future<void> fetchData() async {
-    try {
-      final data =
-          await supabase.from(widget.tableName).select() as List<dynamic>;
-
-      if (data.isEmpty) {
-        setState(() {
-          isLoading = false;
-        });
-        return;
-      }
-
-      final keys = (data.first as Map<String, dynamic>).keys.toList();
-      final fetchedColumns =
-          keys.map((key) => DataColumn(label: Text(key))).toList();
-
-      final fetchedRows =
-          data.map((row) {
-            final cells =
-                keys
-                    .map((key) => DataCell(Text(row[key]?.toString() ?? '')))
-                    .toList();
-            return DataRow(cells: cells);
-          }).toList();
-
-      setState(() {
-        columns = fetchedColumns;
-        rows = fetchedRows;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-        isLoading = false;
-      });
-      print('Error fetching data: $e');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.tableName),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: AppBar(title: Text('Table: $tableName')),
+      body: asyncRows.when(
+        data: (rows) {
+          if (rows.isEmpty) {
+            return const Center(child: Text("Brak danych"));
+          }
+
+          final columns = rows.first.keys.toList();
+
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: [
+                ...columns.map((c) => DataColumn(label: Text(c))),
+                const DataColumn(label: Text("Akcje")),
+              ],
+              rows:
+                  rows.map((row) {
+                    return DataRow(
+                      cells: [
+                        ...columns.map((c) {
+                          return DataCell(
+                            Text('${row[c]}'),
+                            onTap: () {
+                              _showEditDialog(context, ref, tableName, row, c);
+                            },
+                          );
+                        }),
+                        DataCell(
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              ref
+                                  .read(tableProvider(tableName).notifier)
+                                  .deleteRow(row['id']);
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Błąd: $err')),
       ),
-      body: Center(
-        child:
-            isLoading
-                ? const CircularProgressIndicator()
-                : error != null
-                ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Error: $error'),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Back'),
-                    ),
-                  ],
-                )
-                : columns.isEmpty
-                ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('No data available'),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Back'),
-                    ),
-                  ],
-                )
-                : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(columns: columns, rows: rows),
-                ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final columns =
+              asyncRows.asData?.value.isNotEmpty == true
+                  ? asyncRows.asData!.value.first.keys.toList()
+                  : <String>[];
+
+          final newRow = await showDialog<Map<String, dynamic>>(
+            context: context,
+            builder:
+                (_) => AddRowDialog(tableName: tableName, columns: columns),
+          );
+
+          if (newRow != null) {
+            await ref.read(tableProvider(tableName).notifier).addRow(newRow);
+          }
+        },
+        child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  void _showEditDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String tableName,
+    Map<String, dynamic> row,
+    String column,
+  ) {
+    final controller = TextEditingController(text: '${row[column]}');
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text("Edytuj $column"),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(labelText: "Nowa wartość dla $column"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Anuluj"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(tableProvider(tableName).notifier).updateRow(
+                  row['id'],
+                  {column: controller.text},
+                );
+                Navigator.pop(context);
+              },
+              child: const Text("Zapisz"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
