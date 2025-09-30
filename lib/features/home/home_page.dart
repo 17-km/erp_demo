@@ -46,7 +46,7 @@ class HomePage extends ConsumerWidget {
                   MaterialPageRoute(builder: (context) => const AdminPanel()),
                 );
               },
-              child: const Text('Projects'),
+              child: const Text('Tables'),
             ),
             ElevatedButton(
               onPressed: () async {
